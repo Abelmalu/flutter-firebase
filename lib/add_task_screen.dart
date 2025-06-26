@@ -9,44 +9,122 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      title: Text('Add Tasks'),
-    
-    ),
-    body: Padding(padding: EdgeInsets.all(8),child: Column(children: [
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Tasks'), // Added const for better performance
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0), // Added const
+        child: Column(
+          children: [
+            TextField(
+              decoration: const InputDecoration(labelText: 'Title'), // Added const
+              controller: _titleController,
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Description'), // Corrected labelText, added const
+              controller: _descriptionController,
+            ),
+            const SizedBox(height: 10), // Added const
+            ElevatedButton(
+              onPressed: () async {
+                final title = _titleController.text.trim(); // Trim whitespace
+                final description = _descriptionController.text.trim(); // Trim whitespace
 
-      TextField(decoration: InputDecoration(labelText: 'Title'),controller:_titleController),
-      TextField(decoration: InputDecoration(labelText: 'description'),controller:_descriptionController),
-        SizedBox(height: 10,),
-            ElevatedButton(onPressed: () async{
-              final title = _titleController.text;
-              final description = _descriptionController.text;
-               if (title.isNotEmpty) {
+                if (title.isNotEmpty) {
                   await FirebaseFirestore.instance.collection('tasks').add({
                     'title': title,
                     'description': description,
                     'timestamp': Timestamp.now(),
                   });
-                 
+                  // Clear text fields after adding
+                  _titleController.clear();
+                  _descriptionController.clear();
+                } else {
+                  // Optional: Show a snackbar or message if title is empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Title cannot be empty!')),
+                  );
                 }
+              },
+              child: const Text('Add Task'), // Corrected button text, added const
+            ),
+            // --- FIX FOR THE ASSERTION ERROR: Wrapped StreamBuilder in Expanded ---
+            Expanded(
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance.collection('tasks').orderBy('timestamp', descending: true).snapshots(), // Ordered by timestamp
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator()); // Wrapped in Center, added const
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('No Tasks Found')); // Added const
+                  }
 
-              
+                  final tasks = snapshot.data!.docs;
 
+                  return ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = tasks[index];
+                      final taskData = task.data(); // No need for 'as Map<String, dynamic>' if using dynamic
+                      final taskId = task.id; // Get document ID for potential delete/edit operations
 
-              
-
-
-
-            }, child: Text('Add Text'))
-
-    ],),),
-    
-    
+                      return ListTile(
+                        title: Text(taskData['title'] ?? 'No Title'), // Handle potential null
+                        subtitle: Text(taskData['description'] ?? 'No Description'), // Handle potential null
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                // TODO: Implement edit functionality (e.g., show a dialog to edit)
+                                print('Edit task with ID: $taskId');
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () async {
+                                // TODO: Implement delete functionality
+                                try {
+                                  await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Task deleted successfully!')),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to delete task: $e')),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
