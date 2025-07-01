@@ -102,17 +102,19 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () async {
-                                // TODO: Implement delete functionality
-                                try {
-                                  await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Task deleted successfully!')),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Failed to delete task: $e')),
-                                  );
-                                }
+                               
+                                // try {
+                                //   await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
+                                //   ScaffoldMessenger.of(context).showSnackBar(
+                                //     const SnackBar(content: Text('Task deleted successfully!')),
+                                //   );
+                                // } catch (e) {
+                                //   ScaffoldMessenger.of(context).showSnackBar(
+                                //     SnackBar(content: Text('Failed to delete task: $e')),
+                                //   );
+                                // }
+
+                                _deleteTask(task.id);
                               },
                             ),
                           ],
@@ -128,4 +130,32 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       ),
     );
   }
+
+   void _deleteTask( String taskId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Task'),
+          content: const Text('Are you sure you want to delete this task?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
