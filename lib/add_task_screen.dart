@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:notesapp/edit_task_screen.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -95,7 +96,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                               icon: const Icon(Icons.edit),
                               onPressed: () {
                                 // TODO: Implement edit functionality (e.g., show a dialog to edit)
-                                print('Edit task with ID: $taskId');
+                                Navigator.push(context, MaterialPageRoute(builder:(context)=> EditTaskScreen(taskId: task.id,initialTaskTitle: task['title'],initialTaskDescription: task['description'])));
                               },
                             ),
                             IconButton(
