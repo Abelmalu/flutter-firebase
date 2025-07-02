@@ -102,18 +102,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () async {
-                               
-                                // try {
-                                //   await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //     const SnackBar(content: Text('Task deleted successfully!')),
-                                //   );
-                                // } catch (e) {
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //     SnackBar(content: Text('Failed to delete task: $e')),
-                                //   );
-                                // }
-
+                             
                                 _deleteTask(task.id);
                               },
                             ),
