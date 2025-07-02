@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:notesapp/add_task_screen.dart';
-import 'package:notesapp/auth_screen.dart';
+import 'package:notesapp/signup_screen.dart';
 import 'firebase_options.dart';
 
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthScreen(),
+      home: const SignupScreen(),
     );
   }
 }
