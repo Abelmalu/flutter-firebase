@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:notesapp/login_screen.dart';
 import 'firebase_options.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign up'),
+        title: Text('Sign Up'),
       ),
       body: Center(
         child: Container(
@@ -48,6 +49,14 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: _passwordConfirmationController,
                 decoration: InputDecoration(labelText: 'confirmpassword',border: OutlineInputBorder(),),
               ),
+
+              SizedBox(height: 10,),
+              InkWell(onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder:(context)=>SignInScreen()));
+
+
+              },child: Text('SignIn here'),),
+             
                    SizedBox(height: 10,),
               ElevatedButton(child:Text('sign up'),onPressed: (){
 
