@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -8,6 +10,18 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _passwordConfirmationController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+  
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,19 +33,25 @@ class _SignupScreenState extends State<SignupScreen> {
           width:300,
           child: Column(
             children: [
+              SizedBox(height:11),
               TextField(
+                controller:_emailController,
                 decoration: InputDecoration(labelText: 'email',border: OutlineInputBorder(),),
               ),
               SizedBox(height: 10,),
               TextField(
+                controller: _passwordController,
                 decoration: InputDecoration(labelText: 'password',border: OutlineInputBorder(),),
               ),
                   SizedBox(height: 10,),
               TextField(
+                controller: _passwordConfirmationController,
                 decoration: InputDecoration(labelText: 'confirmpassword',border: OutlineInputBorder(),),
               ),
-                  SizedBox(height: 10,),
+                   SizedBox(height: 10,),
               ElevatedButton(child:Text('sign up'),onPressed: (){
+
+                _singUp();
                 
               },)
             ],
@@ -39,5 +59,29 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  void _singUp() async{
+
+    _isLoading = true;
+    _errorMessage = null;
+
+    try{
+
+      UserCredential userCrdential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email:_emailController.text.trim(),
+        password: _passwordController.text.trim()
+      );
+
+      print('user created ${userCrdential}');
+    }on FirebaseAuthException catch (e) {
+    setState(() {
+      _errorMessage = "${e.code} - ${e.message}";
+    });
+    print("Error: $_errorMessage");
+  } 
+    
+
+
   }
 }
